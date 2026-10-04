@@ -1,4 +1,4 @@
-name: Build Debug APKs
+name: Build VirtualApp
 
 on:
   workflow_dispatch:
@@ -8,33 +8,31 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - name: Checkout
+      - name: Download source
         uses: actions/checkout@v4
 
-      - name: Java 17
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Android SDK
-        uses: android-actions/setup-android@v4
+      - name: Setup Android
+        uses: android-actions/setup-android@v3
 
       - name: Install SDK and NDK
         run: |
           yes | sdkmanager --licenses || true
-          sdkmanager "platform-tools"
-          sdkmanager "platforms;android-34"
-          sdkmanager "build-tools;34.0.0"
-          sdkmanager "ndk;21.4.7075529"
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" "ndk;21.4.7075529"
 
-      - name: Build
+      - name: Build APK
         run: |
-          chmod +x gradlew
+          chmod +x ./gradlew
           ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: VirtualApp-APK
-          path: "**/build/outputs/**/*.apk"
+          path: |
+            **/build/outputs/**/*.apk
