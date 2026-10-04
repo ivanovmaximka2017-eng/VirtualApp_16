@@ -1,0 +1,26 @@
+workflows:
+  virtualapp-android:
+    name: VirtualApp 16 ARM64
+    max_build_duration: 120
+    instance_type: linux_x2
+
+    environment:
+      java: 17
+      vars:
+        ANDROID_SDK_ROOT: $ANDROID_SDK_ROOT
+
+    scripts:
+      - name: Set Android SDK location
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+
+      - name: Make Gradle executable
+        script: |
+          chmod +x ./gradlew
+
+      - name: Build VirtualApp
+        script: |
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+    artifacts:
+      - "**/build/outputs/**/*.apk"
